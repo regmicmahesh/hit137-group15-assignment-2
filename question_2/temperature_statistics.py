@@ -85,7 +85,8 @@ def calculate_seasonal_averages(data):
 def find_largest_temp_range(data):
     """ finds the stations with the largest temperature range """
     max_range = 0
-    max_range_stations = ("N/A", 0)
+    max_range_stations = []
+    station_ranges = []
     
     for station in data:
         temps = []
@@ -100,14 +101,15 @@ def find_largest_temp_range(data):
         if temps:
             # Calculate maximum gap between the highest and lowest temperature.
             temp_range = max(temps) - min(temps)
+            station_ranges.append((station['STATION_NAME'], temp_range))
             if temp_range > max_range:
                 max_range = temp_range
-                # make a tuple of the station name and the temperature range.
-                max_range_stations = (station['STATION_NAME'], temp_range)
-            elif temp_range == max_range:
-                max_range_stations = (station['STATION_NAME'], temp_range)
-    
-    return max_range_stations
+
+    for station in station_ranges:
+        if station[1] == max_range:
+            max_range_stations.append(station[0])
+
+    return max_range_stations, max_range
 
 def find_warmest_and_coolest_stations(data):
     """ finds the warmest and coolest stations """
@@ -152,7 +154,7 @@ def find_warmest_and_coolest_stations(data):
 data = read_temperature_data()
 
 seasonal_averages = calculate_seasonal_averages(data)
-station, temp_range = find_largest_temp_range(data)
+max_range_stations, max_range = find_largest_temp_range(data)
 warmest_stations, coolest_stations, warmest_temp, coolest_temp = find_warmest_and_coolest_stations(data)
 
 with open('average_temp.txt', 'w') as f:
@@ -162,7 +164,8 @@ with open('average_temp.txt', 'w') as f:
 
 with open('largest_temp_range_station.txt', 'w') as f:
     f.write("Stations with Largest Temperature Range:\n")
-    f.write(f"{station}: {temp_range:.2f}°C range\n")
+    for station in max_range_stations: 
+        f.write(f"{station}: {max_range:.2f}°C range\n")
 
 with open('warmest_and_coolest_station.txt', 'w') as f:
     f.write("Warmest Stations:\n")
