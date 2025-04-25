@@ -131,11 +131,19 @@ def find_warmest_and_coolest_stations(data):
     # Sort the stations by average temperature.
     station_avgs.sort(key=lambda x: x[1])
     
-    # Get the warmest and coolest temperatures.
-    warmest_station, warmest_temp = station_avgs[-1]
-    coolest_station, coolest_temp = station_avgs[0]
+    warmest_temp = station_avgs[-1][1]
+    coolest_temp = station_avgs[0][1]
 
-    return warmest_station, coolest_station, warmest_temp, coolest_temp
+    warmest_stations = []
+    coolest_stations = []
+
+    for station in station_avgs:
+        if station[1] == warmest_temp:
+            warmest_stations.append(station[0])
+        elif station[1] == coolest_temp:
+            coolest_stations.append(station[0])
+
+    return warmest_stations, coolest_stations, warmest_temp, coolest_temp
 
 ########################################################
 # Main Program
@@ -145,7 +153,7 @@ data = read_temperature_data()
 
 seasonal_averages = calculate_seasonal_averages(data)
 station, temp_range = find_largest_temp_range(data)
-warmest_station, coolest_station, warmest_temp, coolest_temp = find_warmest_and_coolest_stations(data)
+warmest_stations, coolest_stations, warmest_temp, coolest_temp = find_warmest_and_coolest_stations(data)
 
 with open('average_temp.txt', 'w') as f:
     f.write("Seasonal Average Temperatures:\n")
@@ -158,8 +166,10 @@ with open('largest_temp_range_station.txt', 'w') as f:
 
 with open('warmest_and_coolest_station.txt', 'w') as f:
     f.write("Warmest Stations:\n")
-    f.write(f"{warmest_station}: {warmest_temp:.2f}°C average\n")
+    for station in warmest_stations:    
+        f.write(f"{station}: {warmest_temp:.2f}°C average\n")
     f.write("\nCoolest Stations:\n")
-    f.write(f"{coolest_station}: {coolest_temp:.2f}°C average\n")
+    for station in coolest_stations:
+        f.write(f"{station}: {coolest_temp:.2f}°C average\n")
 
 
